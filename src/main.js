@@ -6,10 +6,10 @@ module.exports = async function (req, res) {
   const projectId = process.env.APPWRITE_PROJECT_ID;
   const apiKey = process.env.APPWRITE_API_KEY;
   const databaseId = process.env.APPWRITE_DATABASE_ID;
-  const collectionId = req.variables.COLLECTION_ID; // Pass collection ID dynamically
+  const collectionId = process.env.APPWRITE_USERS_COLLECTION_ID; // Ensure this is the users collection
 
   // Check required environment variables
-  if (!endpoint || !projectId || !apiKey || !databaseId) {
+  if (!endpoint || !projectId || !apiKey || !databaseId || !collectionId) {
     return res.json({ error: "Missing required environment variables." }, 400);
   }
 
@@ -23,12 +23,13 @@ module.exports = async function (req, res) {
     .setKey(apiKey);
 
   try {
-    // List all documents in the collection
+    // Fetch all documents (users) from the collection
     const documents = await databases.listDocuments(databaseId, collectionId);
 
+    // Return all user data
     return res.json({ users: documents.documents });
   } catch (error) {
-    console.error("Error fetching documents:", error.message);
+    console.error("Error fetching user data:", error.message);
     return res.json({ error: error.message }, 500);
   }
 };
